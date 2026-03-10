@@ -8,5 +8,24 @@ sources:
     tables:
       - name: raw_models
         description: "Raw model inventory data."
+        columns:
+          - name: id
+          - name: name
+          - name: dapol_product_code
+          - name: type
+          - name: description
+          - name: livery_company
+          - name: running_number
+          - name: limited_edition_no
+          - name: date_cataloged
+          - name: scale
+          - name: coupling_type
+          - name: dcc_status
+          - name: physical_condition
+          - name: box_condition
+          - name: estimated_value
+          - name: min_acceptable_price
+          - name: created_at
+          - name: updated_at
       - name: raw_sales
         description: "Raw sales data."
