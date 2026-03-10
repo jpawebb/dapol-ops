@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: raw_dapol
+    description: "Raw data ingested from the Streamlit portal."
+    database: neondb
+    schema: bronze
+    tables:
+      - name: raw_models
+        description: "Raw model inventory data."
+      - name: raw_sales
+        description: "Raw sales data."
