@@ -1,1 +1,8 @@
-.streamlit/secrets.toml
+# Streamlit secrets
+.streamlit/
+
+# Python
+__pycache__/
+*.pyc
+env/
+logs/
