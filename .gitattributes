@@ -1,2 +1,7 @@
 *.sql linguist-language=SQL
-*.yml linguist-documentation=true
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+
+*.sql linguist-detectable=true
+*.yml linguist-detectable=true
+*.yaml linguist-detectable=true
