@@ -37,3 +37,5 @@ models:
       +schema: bronze_staging
     marts:
       +schema: marts
+  
+packages-install-path: "dbt_packages"
