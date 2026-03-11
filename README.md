@@ -1,30 +1,26 @@
-# DapolOps: Data Architecture for Rolling Stock Management of Model Trains
+# DapolOps: Production Data Platform for Model Train Inventory Management
 
 ## Overview
-DapolOps is an automated data engineering platform designed to aggregate, validate, and analyze market trends for Dapol model trains. 
+DapolOps is a comprehensive data engieering platform designed to manage, analyse, and track Dapol model train inventory. Built with modern data stack principles, it provides full CRUD operations, data quality assurance, and analytics-ready datasets. 
 
 ## Architecture
-This project utilizes a **Medallion Architecture** to process manual input into actionable insights:
-
-* **Ingestion:** Streamlit UI captures manual inputs and lands raw data in **Google Cloud Storage (Bronze Layer)**.
-* **Validation:** Python/Pydantic scripts enforce schema integrity and flag invalid records.
-* **Transformation:** **dbt Core** transforms validated data into a **Star Schema** within **Google BigQuery (Silver/Gold Layers)**.
-* **Orchestration:** **GitHub Actions** automates the execution of transformation jobs and data quality tests.
-* **Reporting:** **Looker Studio** provides real-time trend analysis.
+**Medallion Architecture**
+```
+📊 STREAMLIT UI → 🗄️ POSTGRESQL (Bronze) → 🔄 dbt (Silver/ Gold) → 📈 ANALYTICS
+```
+- **Bronze:** Raw data ingestion via Streamlit → PostgreSQL (NeonDB)
+- **Silver:** Data cleaning, validation, and staging (dbt)
+- **Gold:** Analytics-ready start schema with business logic
+- **Orchestration:** GitHub Actions for automated testing and deployment
 
 ## Tech Stack
-* **Languages:** Python (Data Validation, Ingestion)
-* **Data Warehouse:** Postgres (Neondb)
-* **Data Modeling:** dbt (data build tool)
-* **CI/CD:** GitHub Actions
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Frontend** | Streamlit | Data entry and editing interface |
+| **Database** | PostgreSQL (NeonDB) | Data storage and processing |
+| **Data Modelling** | dbt Core | Transformation and business logic |
+| **CI/CD** | GitHub Actions | Automated testing and deployment |
+| **Data Quality** | dbt tests | Validation and integrity checks |
+| **Documentation** | dbt docs | Data lineage and catalog |
 
-## Key Data Engineering Features
-- [ ] **Schema Enforcement:** Prevents dirty data from entering the production warehouse using Pydantic.
-- [ ] **Star Schema Design:** Optimized fact and dimension modeling for analytical performance.
-- [ ] **Version-Controlled Pipelines:** Entire pipeline logic is managed as code via Git.
-- [ ] **Data Lineage:** Clear transformation path from raw ingestion to reporting.
 
-## Data Model (Star Schema)
-* **Fact_Sales:** `sale_id`, `date_id`, `model_id`, `sale_price`, `condition_grade`.
-* **Dim_Models:** `model_id`, `model_name`, `era`, `livery_type`, `gauge_scale`.
-* **Dim_Dates:** `date_id`, `month`, `quarter`, `year`.
