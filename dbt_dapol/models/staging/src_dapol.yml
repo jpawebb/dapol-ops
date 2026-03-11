@@ -17,7 +17,7 @@ sources:
           - name: livery_company
           - name: running_number
           - name: limited_edition_no
-          - name: date_cataloged
+          - name: date_catalogued
           - name: scale
           - name: coupling_type
           - name: dcc_status

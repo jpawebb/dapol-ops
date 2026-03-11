@@ -14,11 +14,9 @@ This project utilizes a **Medallion Architecture** to process manual input into 
 
 ## Tech Stack
 * **Languages:** Python (Data Validation, Ingestion)
-* **Data Warehouse:** Google BigQuery
+* **Data Warehouse:** Postgres (Neondb)
 * **Data Modeling:** dbt (data build tool)
-* **Cloud Storage:** Google Cloud Storage (GCS)
 * **CI/CD:** GitHub Actions
-* **Dashboarding:** Looker Studio
 
 ## Key Data Engineering Features
 - [ ] **Schema Enforcement:** Prevents dirty data from entering the production warehouse using Pydantic.
