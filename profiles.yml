@@ -1,0 +1,12 @@
+dbt_dapol:
+  outputs:
+    dev:
+      type: postgres
+      host: ep-cool-cherry-abo9in91-pooler.eu-west-2.aws.neon.tech
+      user: "{{ env_var('DB_USER') }}"
+      password: "{{ env_var('DBT_PASSWORD') }}"
+      port: 5432
+      dbname: neondb
+      schema: bronze
+      threads: 1
+  target: dev
