@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   dbt-run:
-    runs-on: upbuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Setup dbt
