@@ -1,16 +1,39 @@
 name: dbt CI
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [ jpa-core-dev, main ]
+  pull_request:
+    branches: [ jpa-core-dev, main ]
 
 jobs:
   dbt-run:
-    runs-on: upbuntu-latest
+    runs-on: ubuntu-latest
+    
+    # Define environment variables for your Neon connection
+    env:
+      DBT_PASSWORD: ${{ secrets.DBT_PASSWORD }}
+      DB_USER: ${{ secrets.DB_USER }}
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup dbt
-        uses: dbt-labs/dbt-action@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          dbt-command: "dbt run --profiles-dir ."
-      - name: Test dbt
-        uses: dbt-labs/dbt-action@v1
-        with:
-          dbt-command: "dbt test --profiles-dir ."
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install dbt-postgres
+          dbt deps --profiles-dir .
+
+      - name: dbt Debug
+        run: dbt debug --profiles-dir .
+
+      - name: dbt Run
+        run: dbt run --profiles-dir .
+
+      - name: dbt Test
+        run: dbt test --profiles-dir .
