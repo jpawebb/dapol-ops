@@ -188,7 +188,7 @@ with tab2:
                             "Estimated Value (£)",
                             min_value=0.0,
                             step=0.01,
-                            value=current_data.get("estimated_value", 0.0),
+                            value=float(current_data.get("estimated_value", 0.0)),
                         )
 
                     with col4:
@@ -199,7 +199,7 @@ with tab2:
                             "Min Acceptable Price (£)",
                             min_value=0.0,
                             step=0.01,
-                            value=current_data.get("min_acceptable_price", 0.0),
+                            value=float(current_data.get("min_acceptable_price", 0.0)),
                         )
 
                     col5, col6 = st.columns(2)
@@ -262,6 +262,8 @@ with tab2:
                                 st.success(f"Successfully updated '{name}'!")
                                 st.rerun()
 
+                            pass
+
                         except Exception as e:
                             st.error(f"Error updating model: {e}")
 
@@ -278,6 +280,8 @@ with tab2:
                                 f"Successfully deleted '{current_data.get('name', '')}'!"
                             )
                             st.rerun()
+
+                            pass
 
                         except Exception as e:
                             st.error(f"Error deleting model: {e}")
