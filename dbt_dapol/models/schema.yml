@@ -20,6 +20,6 @@ models:
               config:
                 where: "scale is not null"
               arguments:
-                values: ["HO", "N", "O"]  
+                values: ["HO", "N", "O", "OO"]
       - name: created_at
         description: "Timestamp when the model was created."
