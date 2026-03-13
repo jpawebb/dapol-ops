@@ -2,18 +2,41 @@
     config(materialized='table')
  }}
 
-with base as (
+with models as (
     select * from {{ ref('stg_models') }}
 )
 
 select
-    *,
+    id as model_id,
+    full_title,
+    dapol_product_code,
+    model_type,
+    model_subtype,
 
     case
-        when model_type = 'Steam' then 'Classic'
-        else 'Modern'
+        when model_type = 'Wagon' then 'Rolling Stock'
+        when model_type in ('Steam', 'Diesel') then 'Locomotive'
+        else 'Accessories'
     end as category_group,
-    
-    (estimated_value - min_acceptable_price) as potential_profit_margin
 
-from base
+    description,
+    first_extracted_url as extracted_url,
+    livery_company,
+    running_number,
+    edition_no,
+    total_edition_limit,
+
+    date_catalogued,
+    scale,
+    coupling_type,
+    dcc_status,
+    physical_condition,
+    box_condition,
+
+    estimated_value,
+    min_acceptable_price,
+
+    created_at,
+    updated_at
+
+from models
