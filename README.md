@@ -41,4 +41,12 @@ DapolOps is a comprehensive data engieering platform designed to manage, analyse
 5. [PicClick](https://picclick.co.uk/New-Dapol-Limited-Edition-Wagon-Somerset-Trading-Co-254110704972.html)
 
 ## TODO:
-- Add charity for profits
+- Add charity for profit
+    1. Add dim_/ stg_charities models and join to marts on models.id
+    2. Evolve the models schema to add charity_beneficiary
+    3. Other
+
+| neondb_id | charity |
+|--------|--------|
+| 19 | St. Margrets Hospice Care |
+
