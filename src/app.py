@@ -123,168 +123,120 @@ with tab2:
         if selected_model:
             model_id = selected_model[0]
 
-            with engine.connect() as conn:
-                fetch_query = text(
-                    "SELECT * FROM bronze.raw_models WHERE id = :model_id"
-                )
-                result = conn.execute(fetch_query, {"model_id": model_id})
-                current_data = (
-                    result.fetchone()._asdict() if result.rowcount > 0 else {}
-                )
+            if (
+                "editing_id" not in st.session_state
+                or st.session_state.editing_id != model_id
+            ):
+                with engine.connect() as conn:
+                    fetch_query = text(
+                        "SELECT * FROM bronze.raw_models WHERE id = :model_id"
+                    )
+                    result = conn.execute(fetch_query, {"model_id": model_id})
+                    row = result.fetchone()
+                    if row:
+                        st.session_state.current_data = row._asdict()
+                        st.session_state.editing_id = model_id
 
-            if current_data:
-                with st.form("model_edit", clear_on_submit=False):
-                    col1, col2 = st.columns(2)
+            data = st.session_state.current_data
 
-                    with col1:
-                        name = st.text_input(
-                            "Model Name", value=current_data.get("name", "")
-                        )
-                        prod_code = st.text_input(
-                            "Dapol Product Code",
-                            value=current_data.get("dapol_product_code", ""),
-                        )
-                        type_ = st.text_input(
-                            "Model Type", value=current_data.get("type", "")
-                        )
-                        livery = st.text_input(
-                            "Livery Company",
-                            value=current_data.get("livery_company", ""),
-                        )
-                        running = st.text_input(
-                            "Running Number",
-                            value=current_data.get("running_number", ""),
-                        )
-
-                    with col2:
-                        scale = st.text_input(
-                            "Scale", value=current_data.get("scale", "")
-                        )
-                        coupling = st.text_input(
-                            "Coupling Type", value=current_data.get("coupling_type", "")
-                        )
-                        dcc = st.text_input(
-                            "DCC Status", value=current_data.get("dcc_status", "")
-                        )
-                        edition = st.text_input(
-                            "Limited Edition Number",
-                            value=current_data.get("limited_edition_no", ""),
-                        )
-
-                    description = st.text_area(
-                        "Description",
-                        value=current_data.get("description", ""),
-                        max_chars=200,
+            with st.form("model_edit", clear_on_submit=False):
+                col1, col2 = st.columns(2)
+                with col1:
+                    name = st.text_input("Model Name", value=data.get("name", ""))
+                    prod_code = st.text_input(
+                        "Dapol Product Code", value=data.get("dapol_product_code", "")
+                    )
+                    type_ = st.text_input("Model Type", value=data.get("type", ""))
+                    livery = st.text_input(
+                        "Livery Company", value=data.get("livery_company", "")
+                    )
+                    running = st.text_input(
+                        "Running Number", value=data.get("running_number", "")
+                    )
+                with col2:
+                    scale = st.text_input("Scale", value=data.get("scale", ""))
+                    coupling = st.text_input(
+                        "Coupling Type", value=data.get("coupling_type", "")
+                    )
+                    dcc = st.text_input("DCC Status", value=data.get("dcc_status", ""))
+                    edition = st.text_input(
+                        "Limited Edition Number",
+                        value=data.get("limited_edition_no", ""),
                     )
 
-                    col3, col4 = st.columns(2)
+                description = st.text_area(
+                    "Description", value=data.get("description", ""), max_chars=200
+                )
 
-                    with col3:
-                        physical_condition = st.text_input(
-                            "Physical Condition",
-                            value=current_data.get("physical_condition", ""),
-                        )
-                        price = st.number_input(
-                            "Estimated Value (£)",
-                            min_value=0.0,
-                            step=0.01,
-                            value=float(current_data.get("estimated_value", 0.0)),
-                        )
+                col3, col4 = st.columns(2)
+                with col3:
+                    physical_condition = st.text_input(
+                        "Physical Condition", value=data.get("physical_condition", "")
+                    )
+                    val = data.get("estimated_value")
+                    price = st.number_input(
+                        "Estimated Value (£)",
+                        min_value=0.0,
+                        step=0.01,
+                        value=float(val) if val else 0.0,
+                    )
+                with col4:
+                    box_condition = st.text_input(
+                        "Box Condition", value=data.get("box_condition", "")
+                    )
+                    min_val = data.get("min_acceptable_price")
+                    min_acceptable_price = st.number_input(
+                        "Min Acceptable Price (£)",
+                        min_value=0.0,
+                        step=0.01,
+                        value=float(min_val) if min_val else 0.0,
+                    )
 
-                    with col4:
-                        box_condition = st.text_input(
-                            "Box Condition", value=current_data.get("box_condition", "")
-                        )
-                        min_acceptable_price = st.number_input(
-                            "Min Acceptable Price (£)",
-                            min_value=0.0,
-                            step=0.01,
-                            value=float(current_data.get("min_acceptable_price", 0.0)),
-                        )
+                update_submitted = st.form_submit_button("Update Model", type="primary")
 
-                    col5, col6 = st.columns(2)
+            # Handle logic outside the form block for cleaner flow
+            if update_submitted:
+                try:
+                    update_query = text(
+                        """
+                        UPDATE bronze.raw_models SET
+                            name = :name, dapol_product_code = :prod_code, type = :type,
+                            description = :desc, livery_company = :livery, running_number = :running,
+                            limited_edition_no = :edition, scale = :scale, coupling_type = :coupling,
+                            dcc_status = :dcc, physical_condition = :phys, box_condition = :box,
+                            estimated_value = :est_val, min_acceptable_price = :min_val,
+                            updated_at = :updated
+                        WHERE id = :model_id
+                    """
+                    )
 
-                    with col5:
-                        update_submitted = st.form_submit_button(
-                            "Update Model", type="primary"
-                        )
+                    params = {
+                        "name": name,
+                        "prod_code": prod_code,
+                        "type": type_,
+                        "desc": description,
+                        "livery": livery,
+                        "running": running,
+                        "edition": edition,
+                        "scale": scale,
+                        "coupling": coupling,
+                        "dcc": dcc,
+                        "phys": physical_condition,
+                        "box": box_condition,
+                        "est_val": price,
+                        "min_val": min_acceptable_price,
+                        "updated": datetime.now(),
+                        "model_id": model_id,
+                    }
 
-                    with col6:
-                        delete_submitted = st.form_submit_button(
-                            "Delete Model", type="secondary"
-                        )
+                    with engine.begin() as conn:
+                        conn.execute(update_query, params)
 
-                    if update_submitted:
-                        try:
-                            update_query = text(
-                                """
-                                UPDATE bronze.raw_models SET
-                                    name = :name,
-                                    dapol_product_code = :prod_code,
-                                    type = :type,
-                                    description = :desc,
-                                    livery_company = :livery,
-                                    running_number = :running,
-                                    limited_edition_no = :edition,
-                                    scale = :scale,
-                                    coupling_type = :coupling,
-                                    dcc_status = :dcc,
-                                    physical_condition = :phys,
-                                    box_condition = :box,
-                                    estimated_value = :est_val,
-                                    min_acceptable_price = :min_val,
-                                    updated_at = :updated
-                                WHERE id = :model_id
-                            """
-                            )
-                            params = {
-                                "name": name,
-                                "prod_code": prod_code,
-                                "type": type_,
-                                "desc": description,
-                                "livery": livery,
-                                "running": running,
-                                "edition": edition,
-                                "scale": scale,
-                                "coupling": coupling,
-                                "dcc": dcc,
-                                "phys": physical_condition,
-                                "box": box_condition,
-                                "est_val": price,
-                                "min_val": min_acceptable_price,
-                                "updated": datetime.now(),
-                                "model_id": model_id,
-                            }
+                    if "editing_id" in st.session_state:
+                        del st.session_state.editing_id
 
-                            with engine.begin() as conn:
-                                conn.execute(update_query, params)
+                    st.success(f"Successfully updated '{name}'!")
+                    st.rerun()
 
-                                st.success(f"Successfully updated '{name}'!")
-                                st.rerun()
-
-                            pass
-
-                        except Exception as e:
-                            st.error(f"Error updating model: {e}")
-
-                    if delete_submitted:
-                        try:
-                            delete_query = text(
-                                "DELETE FROM bronze.raw_models WHERE id = :model_id"
-                            )
-
-                            with engine.begin() as conn:
-                                conn.execute(delete_query, {"model_id": model_id})
-
-                            st.success(
-                                f"Successfully deleted '{current_data.get('name', '')}'!"
-                            )
-                            st.rerun()
-
-                            pass
-
-                        except Exception as e:
-                            st.error(f"Error deleting model: {e}")
-
-    else:
-        st.info("No models found in the database. Please add a model first.")
+                except Exception as e:
+                    st.error(f"Error updating model: {e}")
