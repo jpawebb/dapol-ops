@@ -35,10 +35,14 @@ select
     cast(nullif(split_part(limited_edition_no, ' of ', 1), '') as int) as edition_no,
     cast(nullif(split_part(limited_edition_no, ' of ', 2), '') as int) as total_edition_limit,
 
+    charity_id,
+    
     date_catalogued,
 
     case
-        when scale in ('N', 'OO', 'O', '0') then scale
+        when scale = 'OO' then 'OO Gauge'
+        when scale = 'N' then 'N Gauge'
+        when scale = 'O' then 'O Gauge'
         else 'Unknown'
     end as scale,
 

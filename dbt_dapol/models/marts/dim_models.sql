@@ -4,6 +4,10 @@
 
 with models as (
     select * from {{ ref('stg_models') }}
+),
+
+charities as (
+    select * from {{ ref('stg_charities') }}
 )
 
 select
@@ -26,6 +30,9 @@ select
     edition_no,
     total_edition_limit,
 
+    -- Charity info
+    c.charity_name,
+
     date_catalogued,
     scale,
     coupling_type,
@@ -36,7 +43,8 @@ select
     estimated_value,
     min_acceptable_price,
 
-    created_at,
-    updated_at
+    m.created_at,
+    m.updated_at
 
-from models
+from models m
+left join charities c on m.charity_id = c.charity_id
