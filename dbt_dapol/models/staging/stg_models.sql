@@ -38,7 +38,9 @@ select
     date_catalogued,
 
     case
-        when scale in ('N', 'OO', 'O', '0') then scale
+        when scale = 'OO' then 'OO Gauge'
+        when scale = 'N' then 'N Gauge'
+        when scale = 'O' then 'O Gauge'
         else 'Unknown'
     end as scale,
 

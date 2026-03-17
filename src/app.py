@@ -6,7 +6,16 @@ from db_connection import get_engine
 # Page setup for a professional look
 st.set_page_config(page_title="Dapol Inventory Portal", layout="wide")
 
-tab1, tab2 = st.tabs(["Add New Model", "Edit Existing Model"])
+engine = get_engine()
+with engine.connect() as conn:
+    charity_res = conn.execute(
+        text("SELECT id, charity_name FROM bronze.raw_charities ORDER BY charity_name")
+    )
+    # Create a mapping: {"Charity Name": ID}
+    charity_map = {row[1]: row[0] for row in charity_res}
+
+
+tab1, tab2, tab3 = st.tabs(["Add New Model", "Edit Existing Model", "Add New Charity"])
 
 with tab1:
     st.title("--Dapol Inventory Entry--")
@@ -31,6 +40,15 @@ with tab1:
             coupling = st.text_input("Coupling Type")
             dcc = st.text_input("DCC Status")
             edition = st.text_input("Limited Edition Number")
+
+            selected_charity = st.selectbox(
+                "Charity Partner", options=["None"] + list(charity_map.keys())
+            )
+            charity_id = (
+                charity_map.get(selected_charity)
+                if selected_charity != "None"
+                else None
+            )
 
         description = st.text_area("Description", max_chars=200)
 
@@ -59,12 +77,12 @@ with tab1:
                     """
                     INSERT INTO bronze.raw_models (
                         name, dapol_product_code, type, description, livery_company, running_number, 
-                        limited_edition_no, date_catalogued, scale, coupling_type, dcc_status, 
+                        limited_edition_no, charity_id, date_catalogued, scale, coupling_type, dcc_status, 
                         physical_condition, box_condition, estimated_value, min_acceptable_price, 
                         created_at, updated_at
                     ) VALUES (
                         :name, :prod_code, :type, :desc, :livery, :running, 
-                        :edition, :date_cat, :scale, :coupling, :dcc, 
+                        :edition, :charity_id, :date_cat, :scale, :coupling, :dcc, 
                         :phys, :box, :est_val, :min_val, 
                         :created, :updated
                     )
@@ -79,6 +97,7 @@ with tab1:
                     "livery": livery,
                     "running": running,
                     "edition": edition,
+                    "charity_id": charity_id,
                     "date_cat": date_catalogued,
                     "scale": scale,
                     "coupling": coupling,
@@ -138,6 +157,24 @@ with tab2:
                         st.session_state.editing_id = model_id
 
             data = st.session_state.current_data
+
+            # Pre-calculate charity default index
+            current_charity_id = data.get("charity_id")
+            charity_names = list(charity_map.keys())
+            default_idx = 0
+            if current_charity_id:
+                for idx, (name, cid) in enumerate(charity_map.items()):
+                    if cid == current_charity_id:
+                        default_idx = idx + 1
+                        break
+
+            # Charity selection (placed before the form for reactivity)
+            charity_edit = st.selectbox(
+                "Charity Partner", options=["None"] + charity_names, index=default_idx
+            )
+            new_charity_id = (
+                charity_map.get(charity_edit) if charity_edit != "None" else None
+            )
 
             with st.form("model_edit", clear_on_submit=False):
                 col1, col2 = st.columns(2)
@@ -202,10 +239,10 @@ with tab2:
                         UPDATE bronze.raw_models SET
                             name = :name, dapol_product_code = :prod_code, type = :type,
                             description = :desc, livery_company = :livery, running_number = :running,
-                            limited_edition_no = :edition, scale = :scale, coupling_type = :coupling,
-                            dcc_status = :dcc, physical_condition = :phys, box_condition = :box,
-                            estimated_value = :est_val, min_acceptable_price = :min_val,
-                            updated_at = :updated
+                            limited_edition_no = :edition, charity_id = :charity_id, scale = :scale, 
+                            coupling_type = :coupling, dcc_status = :dcc, physical_condition = :phys, 
+                            box_condition = :box, estimated_value = :est_val, 
+                            min_acceptable_price = :min_val, updated_at = :updated
                         WHERE id = :model_id
                     """
                     )
@@ -218,6 +255,7 @@ with tab2:
                         "livery": livery,
                         "running": running,
                         "edition": edition,
+                        "charity_id": new_charity_id,
                         "scale": scale,
                         "coupling": coupling,
                         "dcc": dcc,
@@ -240,3 +278,21 @@ with tab2:
 
                 except Exception as e:
                     st.error(f"Error updating model: {e}")
+
+with tab3:
+    st.title("--Register a New Charity--")
+    with st.form("charity_entry", clear_on_submit=True):
+        new_char_name = st.text_input("Charity Name")
+        if st.form_submit_button("Register Charity") and new_char_name:
+            try:
+                with engine.begin() as conn:
+                    conn.execute(
+                        text(
+                            "INSERT INTO bronze.raw_charities (charity_name) VALUES (:name)"
+                        ),
+                        {"name": new_char_name},
+                    )
+                st.success(f"Registered {new_char_name}!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Error: {e}")

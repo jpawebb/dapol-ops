@@ -29,3 +29,13 @@ sources:
           - name: updated_at
       - name: raw_sales
         description: "Raw sales data."
+      - name: raw_charities
+        description: "List of charity partners registered via the Streamlit portal."
+        columns:
+          - name: id
+            tests:
+              - unique
+              - not_null
+          - name: charity_name
+            tests:
+              - not_null
