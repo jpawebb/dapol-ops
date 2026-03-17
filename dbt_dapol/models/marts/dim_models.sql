@@ -47,4 +47,4 @@ select
     updated_at
 
 from models m
-left join charities c on m.charity_id = c.charity_id
+left join charities c on c.charity_id = m.charity_id
