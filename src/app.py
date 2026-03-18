@@ -70,55 +70,77 @@ with tab1:
         submitted = st.form_submit_button("Add to Inventory")
 
         if submitted:
-            try:
-                engine = get_engine()
 
-                insert_query = text(
-                    """
-                    INSERT INTO bronze.raw_models (
-                        name, dapol_product_code, type, description, livery_company, running_number, 
-                        limited_edition_no, charity_id, date_catalogued, scale, coupling_type, dcc_status, 
-                        physical_condition, box_condition, estimated_value, min_acceptable_price, 
-                        created_at, updated_at
-                    ) VALUES (
-                        :name, :prod_code, :type, :desc, :livery, :running, 
-                        :edition, :charity_id, :date_cat, :scale, :coupling, :dcc, 
-                        :phys, :box, :est_val, :min_val, 
-                        :created, :updated
-                    )
-                """
+            # Minimum required fields validation
+            required_fields = {
+                "Model Name": name,
+                "Product Code": prod_code,
+                "Type": type_,
+                "Scale": scale,
+                "Condition": physical_condition,
+                "Box Condition": box_condition,
+            }
+
+            missing = [
+                label
+                for label, value in required_fields.items()
+                if not value or value.strip() == ""
+            ]
+
+            if missing:
+                st.error(
+                    f"Please fill in the following required fields: {', '.join(missing)}"
                 )
+            else:
+                try:
+                    engine = get_engine()
 
-                params = {
-                    "name": name,
-                    "prod_code": prod_code,
-                    "type": type_,
-                    "desc": description,
-                    "livery": livery,
-                    "running": running,
-                    "edition": edition,
-                    "charity_id": charity_id,
-                    "date_cat": date_catalogued,
-                    "scale": scale,
-                    "coupling": coupling,
-                    "dcc": dcc,
-                    "phys": physical_condition,
-                    "box": box_condition,
-                    "est_val": price,
-                    "min_val": min_acceptable_price,
-                    "created": created_at,
-                    "updated": updated_at,
-                }
+                    insert_query = text(
+                        """
+                        INSERT INTO bronze.raw_models (
+                            name, dapol_product_code, type, description, livery_company, running_number, 
+                            limited_edition_no, charity_id, date_catalogued, scale, coupling_type, dcc_status, 
+                            physical_condition, box_condition, estimated_value, min_acceptable_price, 
+                            created_at, updated_at
+                        ) VALUES (
+                            :name, :prod_code, :type, :desc, :livery, :running, 
+                            :edition, :charity_id, :date_cat, :scale, :coupling, :dcc, 
+                            :phys, :box, :est_val, :min_val, 
+                            :created, :updated
+                        )
+                    """
+                    )
 
-                # 3. Using 'engine.begin()' to auto-commit the transaction
-                with engine.begin() as conn:
-                    conn.execute(insert_query, params)
+                    params = {
+                        "name": name,
+                        "prod_code": prod_code,
+                        "type": type_,
+                        "desc": description,
+                        "livery": livery,
+                        "running": running,
+                        "edition": edition,
+                        "charity_id": charity_id,
+                        "date_cat": date_catalogued,
+                        "scale": scale,
+                        "coupling": coupling,
+                        "dcc": dcc,
+                        "phys": physical_condition,
+                        "box": box_condition,
+                        "est_val": price,
+                        "min_val": min_acceptable_price,
+                        "created": created_at,
+                        "updated": updated_at,
+                    }
 
-                st.success(f"Successfully added '{name}' to the database!")
-                st.balloons()
+                    # 3. Using 'engine.begin()' to auto-commit the transaction
+                    with engine.begin() as conn:
+                        conn.execute(insert_query, params)
 
-            except Exception as e:
-                st.error(f"Error ingesting data: {e}")
+                    st.success(f"Successfully added '{name}' to the database!")
+                    st.balloons()
+
+                except Exception as e:
+                    st.error(f"Error ingesting data: {e}")
 
 with tab2:
     st.title("--Edit Existing Model--")
