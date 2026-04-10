@@ -12,7 +12,7 @@ jobs:
   dbt-run:
     runs-on: ubuntu-latest
     
-    # Define environment variables for your Neon connection
+    # Define environment variables for Neon connection
     env:
       DBT_PASSWORD: ${{ secrets.DBT_PASSWORD }}
       DB_USER: ${{ secrets.DB_USER }}
