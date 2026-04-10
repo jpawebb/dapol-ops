@@ -39,29 +39,16 @@ jobs:
 
       - name: dbt Test
         run: dbt test --profiles-dir .
-
-      - name: Authenticate GitHub CLI
-        env:
-          GH_TOKEN: ${{ secrets.GIST_TOKEN }}
-        run: echo "$GH_TOKEN" | gh auth login --with-token
-
       - name: Update Dynamic Badge
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/jpa-core-dev'
         env:
           GIST_ID: ${{ secrets.GIST_ID }}
+          GH_TOKEN: ${{ secrets.GIST_TOKEN }}
+          DBT_PASSWORD: ${{ secrets.DBT_PASSWORD }}
+          DB_USER: ${{ secrets.DB_USER }}
         run: |
-          # 1. Install psql client (minimal install)
           sudo apt-get update && sudo apt-get install -y postgresql-client
-
-          # 2. Query Neon for the count of models in the registry
-          # Note: DB_USER and DBT_PASSWORD are inherited from job-level env
           COUNT=$(psql "postgresql://$DB_USER:$DBT_PASSWORD@ep-cool-cherry-abo9in91-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require" -t -c "SELECT count(*) FROM marts.dim_models;")
-          
-          # 3. Clean the output
           CLEAN_COUNT=$(echo $COUNT | tr -d '[:space:]')
-          
-          # 4. Create the JSON payload for Shields.io
           echo "{\"schemaVersion\": 1, \"label\": \"Models in Registry\", \"message\": \"$CLEAN_COUNT\", \"color\": \"blue\"}" > dapol_stats.json
-          
-          # 5. Push to Gist using GitHub CLI
-          gh gist edit "$GIST_ID" dapol_stats.json
+          gh gist edit $GIST_ID dapol_stats.json
