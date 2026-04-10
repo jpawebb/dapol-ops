@@ -5,7 +5,6 @@
 ![Database](https://img.shields.io/badge/Database-PostgreSQL%20(Neon)-00A3FF)
 ![Registry Count](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/jpawebb/52696f4cc2409a384edce3e16955c875/raw/dapol_stats.json)
 
-
 ![dapol-logo](images/dapol-logo.avif)
 
 
