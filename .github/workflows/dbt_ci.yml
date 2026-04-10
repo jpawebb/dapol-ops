@@ -5,6 +5,8 @@ on:
     branches: [ jpa-core-dev, main ]
   pull_request:
     branches: [ jpa-core-dev, main ]
+  schedule:
+    - cron: '0 */4 * * *'  # Every 4 hours (UTC)
 
 jobs:
   dbt-run:
@@ -38,11 +40,15 @@ jobs:
       - name: dbt Test
         run: dbt test --profiles-dir .
 
+      - name: Authenticate GutHub CLI
+	env:
+	  GH_TOKEN: ${{ secrets.GIST_TOKEN }}
+	run: gh auth login --with-token < <(echo $GH_TOKEN)
+
       - name: Update Dynamic Badge
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/jpa-core-dev'
         env:
           GIST_ID: ${{ secrets.GIST_ID }}
-          GH_TOKEN: ${{ secrets.GIST_TOKEN }}
           DBT_PASSWORD: ${{ secrets.DBT_PASSWORD }}
           DB_USER: ${{ secrets.DB_USER }}
         run: |
