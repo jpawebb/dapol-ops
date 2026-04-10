@@ -51,6 +51,6 @@ DapolOps is a comprehensive data engieering platform designed to manage, analyse
     - `sale_url`
     - `sale_price`
     - `sale_date`
-    - new logic for estimated vale
+    - new logic for estimated value
     - `if registered_sale then; estimated_value = round down to nearest 5/10`
     - `if registered_listing then; estimated_value = -10% then round down to nearest 5/10`
