@@ -41,12 +41,16 @@ DapolOps is a comprehensive data engieering platform designed to manage, analyse
 5. [PicClick](https://picclick.co.uk/New-Dapol-Limited-Edition-Wagon-Somerset-Trading-Co-254110704972.html)
 
 ## TODO:
-- Add charity for profit
-    1. Add dim_/ stg_charities models and join to marts on models.id
-    2. Evolve the models schema to add charity_beneficiary
-    3. Other
-
-| neondb_id | charity |
-|--------|--------|
-| 19 | St. Margrets Hospice Care |
-
+- New col - Brand (Dapol/ Hornby)
+- Update col - Scale -> OO Gauge (OO is Dapol specific)
+- Column descriptions (default values)
+- Listing v Sale? Regex is flimsy
+    - `listing_url`
+    - `listing_price`
+    - `listing_date`
+    - `sale_url`
+    - `sale_price`
+    - `sale_date`
+    - new logic for estimated vale
+    - `if registered_sale then; estimated_value = round down to nearest 5/10`
+    - `if registered_listing then; estimated_value = -10% then round down to nearest 5/10`
