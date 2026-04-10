@@ -40,7 +40,7 @@ jobs:
       - name: dbt Test
         run: dbt test --profiles-dir .
 
-      - name: Authenticate GutHub CLI
+      - name: Authenticate GitHub CLI
 	env:
 	  GH_TOKEN: ${{ secrets.GIST_TOKEN }}
 	run: gh auth login --with-token < <(echo $GH_TOKEN)
